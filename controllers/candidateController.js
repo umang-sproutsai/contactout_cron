@@ -280,7 +280,7 @@ function getCurrentCompany(data) {
 async function findPartitionsAndLocation(location) {
   let locationInfo = {
     location: "",
-    partition: "people_us", // Default partition
+    partition: "reject_candidate", // Default partition
   };
   
   if (location && location.length > 0) {
