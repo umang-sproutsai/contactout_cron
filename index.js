@@ -36,7 +36,7 @@ app.post('/elsetic-candidate', findElasticCandidate)
 app.post('/sync-data', syncData)
 
 // Set up a cron job to run every minute
-let limit = 10
+let limit = 200
 let skip = 0
 cron.schedule('* * * * *', async () => {
   try {
