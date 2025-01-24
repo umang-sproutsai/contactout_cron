@@ -31,24 +31,44 @@ const updateCronLog = async (data) => {
   });
 };
 
-const getLastCronLogSkip = async () => {
-    try {
-        console.log('Getting last cron log`');
-      // Find the last cron log (most recent based on the createdAt field)
-      const lastCronLog = await CronLogs.findOne().sort({ createdAt: -1 });
-  
-      if (!lastCronLog) {
-        return null;
-      }
-  
-      // Return the skip value of the last cron log
-      console.log(`Last cron log ${lastCronLog}`)
-      return parseInt(lastCronLog.skip);
-    } catch (error) {
-      console.error('Error fetching the last cron log:', error);
-      throw new Error('Error fetching the last cron log');
+const getCronLogById = async (logId) => {
+  try {
+    console.log(`Fetching cron log with ID: ${logId}`);
+
+    // Find the log by its ID
+    const cronLog = await CronLogs.findById(logId);
+
+    if (!cronLog) {
+      console.log("No cron log found with the given ID.");
+      return null;
     }
-  };
+
+    console.log("Cron log found:", cronLog);
+    return cronLog;
+  } catch (error) {
+    console.error("Error fetching the cron log by ID:", error);
+    throw new Error("Error fetching the cron log by ID");
+  }
+};
+
+const getLastCronLogSkip = async () => {
+  try {
+    console.log("Getting last cron log`");
+    // Find the last cron log (most recent based on the createdAt field)
+    const lastCronLog = await CronLogs.findOne().sort({ createdAt: -1 });
+
+    if (!lastCronLog) {
+      return null;
+    }
+
+    // Return the skip value of the last cron log
+    console.log(`Last cron log ${lastCronLog}`);
+    return parseInt(lastCronLog.skip);
+  } catch (error) {
+    console.error("Error fetching the last cron log:", error);
+    throw new Error("Error fetching the last cron log");
+  }
+};
 
 const syncData = async (req, res) => {
   try {
@@ -69,12 +89,19 @@ const syncData = async (req, res) => {
 const syncCron = async (data) => {
   let limit = data.limit;
   let skip = data.skip;
-  let logData = await createCronLog({
-    skip,
-    limit,
-    message: "start",
-    status: 888,
-  });
+  //   let logData
+  if (data.logId) {
+    logData = await getCronLogById(data.logId);
+    limit = logData.limit;
+    skip = logData.skip;
+  } else {
+    logData = await createCronLog({
+      skip,
+      limit,
+      message: "start",
+      status: 888,
+    });
+  }
   try {
     // Call the syncCreateOrUpdateData function with skip and limit
     const data = await syncCreateOrUpdateData(limit, skip);
@@ -98,5 +125,5 @@ module.exports = {
   updateCronLog,
   syncData,
   syncCron,
-  getLastCronLogSkip
+  getLastCronLogSkip,
 };

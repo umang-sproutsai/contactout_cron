@@ -45,12 +45,13 @@ const syncCreateOrUpdateData = async (limit, skip) => {
     // Fetch candidate details from the database
 
     const candidateDetails = await CandidateDetails.find({
+      // linkedin: "https://www.linkedin.com/in/ben-jarvis-83918572",
       linkedin: { $ne: null, $exists: true },
     })
       .skip(skip)
       .limit(limit)
       .lean();
-    console.log("candiant details", candidateDetails);
+    // console.log("candiant details", candidateDetails);
     if (candidateDetails.length === 0) {
       return { success: true, message: "No candidate details found to index." };
     }
@@ -85,7 +86,7 @@ const syncCreateOrUpdateData = async (limit, skip) => {
       const hits = searchResult.hits.hits;
       if (hits.length > 0) {
         const existingId = hits[0]._id;
-        console.log(`Found existing`,hits)
+        // console.log(`Found existing`,hits)
         await client.update({
           index: partition,
           id: existingId,
@@ -176,7 +177,7 @@ function mapToElasticsearchUpdate(candidate, oldData) {
 
 // Get coordinates from location
 function getCoordinates(data) {
-  if (!data || data.length === 0) return null;
+  if (!data || data.length === 0 || !data[0]?.lat || !data[0]?.lon ) return null;
   return {
     lat: data[0]?.lat,
     lon: data[0]?.lon,
@@ -207,6 +208,7 @@ function getFormattedMonthAndYear(dateString) {
 
 //get skills
 function getSkills(data) {
+  if(!data || data == null) return []
   if (Array.isArray(data) && data.every((item) => typeof item !== "object")) {
     return data;
   }
