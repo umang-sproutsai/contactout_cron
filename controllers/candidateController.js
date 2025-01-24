@@ -45,13 +45,13 @@ const syncCreateOrUpdateData = async (limit, skip) => {
     // Fetch candidate details from the database
 
     const candidateDetails = await CandidateDetails.find({
-      linkedin: "https://www.linkedin.com/in/bharathgr2203",
-      // linkedin: { $ne: null, $exists: true },
+      // linkedin: "https://www.linkedin.com/in/bharathgr2203",
+      linkedin: { $ne: null, $exists: true },
     })
-      // .skip(skip)
-      // .limit(limit)
+      .skip(skip)
+      .limit(limit)
       .lean();
-    console.log("candiant details", candidateDetails);
+    // console.log("candiant details", candidateDetails);
     if (candidateDetails.length === 0) {
       return { success: true, message: "No candidate details found to index." };
     }
@@ -288,7 +288,6 @@ async function findPartitionsAndLocation(location) {
       location[0] = location[0][0]
     }
     // Build a readable location string
-    console.log('location: ' + location[0].country)
     const locationParts = [];
     if (location[0].city) locationParts.push(location[0].city);
     if (location[0].state) locationParts.push(location[0].state);
